@@ -56,6 +56,12 @@ func (ac *Agent) Write(p *snet.Packet) {
 
 func (ac *Agent) dispatchAgentPacket(p *snet.Packet) {
 	switch p.Head {
+	case 0x0010:
+		for _, v := range connMap {
+			if ac != v {
+				v.Write(p)
+			}
+		}
 	default:
 		for _, v := range connMap {
 			v.Write(p)

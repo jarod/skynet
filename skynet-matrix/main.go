@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	Version = "0.2-120616"
+	Version = "0.3-130117"
 )
 
 var version = flag.Bool("version", false, "show skynet-matrix version")

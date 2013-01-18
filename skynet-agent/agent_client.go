@@ -8,11 +8,13 @@ import (
 	"io"
 	"log"
 	"net"
+	"sync"
 )
 
 var (
 	idMap   map[int32]*AgentClient
 	connMap map[*net.TCPConn]*AgentClient
+	mutex   sync.Mutex
 )
 
 func init() {
@@ -46,7 +48,7 @@ func onClientDisconnected(ac *AgentClient) {
 	delete(connMap, ac.conn)
 	if ac.id >= 0 {
 		delete(idMap, ac.id)
-		m := &skynet.SInt32{
+		m := &skynet.Psint32{
 			Value: proto.Int32(ac.id),
 		}
 		p, _ := snet.NewMessagePacket(0x0001, m)
@@ -71,15 +73,30 @@ func (ac *AgentClient) dispatchClientPacket(p *snet.Packet) {
 	switch p.Head {
 	case 0x0000:
 		ac.registerClient(p)
+	case 0x0010:
+		ac.sendToClient(p)
 	}
-	log.Printf("dispatchClientPacket %v\n", p)
+	//log.Printf("dispatchClientPacket %v\n", p)
 }
 
 func (ac *AgentClient) registerClient(p *snet.Packet) {
-	id := new(skynet.SInt32)
+	id := new(skynet.Psint32)
 	proto.Unmarshal(p.Body, id)
 	ac.id = id.GetValue()
+
 	idMap[id.GetValue()] = ac
 	matrixClient.Write(p)
 	log.Printf("New client id=%d,ip=%s", ac.id, ac.conn.RemoteAddr())
+}
+
+func (ac *AgentClient) sendToClient(p *snet.Packet) {
+	msg := new(skynet.ToWiredMsg)
+	proto.Unmarshal(p.Body, msg)
+	mutex.Lock()
+	defer mutex.Unlock()
+	if c, ok := idMap[int32(*msg.WiredId)]; ok {
+		c.Write(p)
+	} else {
+		matrixClient.Write(p)
+	}
 }

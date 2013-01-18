@@ -18,3 +18,9 @@ message WiredServer {
 	optional string host = 2;
 	optional uint32 port = 3;
 }
+
+message ToWiredMsg {
+	required uint32 wired_id = 1; 
+	required uint32 head = 2;
+	optional bytes data = 3;
+}
