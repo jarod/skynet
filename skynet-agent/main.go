@@ -7,11 +7,10 @@ import (
 	"log"
 	"net"
 	"os"
-	"time"
 )
 
 const (
-	Version = "0.3-130117"
+	Version = "0.4-130531"
 )
 
 var version = flag.Bool("version", false, "show skynet-agent version")
@@ -43,22 +42,6 @@ func bindAgentServer() {
 		go onClientConnected(conn)
 	}
 	listener.Close()
-}
-
-func readMatrix(mc *smc.MatrixClient) {
-	matrixClient = mc
-	for {
-		p, err := mc.Read()
-		if err != nil {
-			log.Printf("readMatrix err=%v", err)
-			time.Sleep(16 * time.Second)
-			continue
-		}
-		for _, v := range connMap {
-			log.Printf("readMatrix %v", p)
-			v.Write(p)
-		}
-	}
 }
 
 func main() {

@@ -9,10 +9,14 @@ import (
 )
 
 const (
-	Version = "0.3-130117"
+	Version = "0.4-130531"
 )
 
 var version = flag.Bool("version", false, "show skynet-matrix version")
+
+var (
+	httpServer *MatrixHttpServer
+)
 
 func bindMatrixServer() {
 	addr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:1860")
@@ -43,5 +47,8 @@ func main() {
 		fmt.Printf("skynet-matrix - %s\n", Version)
 		os.Exit(0)
 	}
-	bindMatrixServer()
+	go bindMatrixServer()
+
+	httpServer = NewMatrixHttpServer()
+	httpServer.Startup(":1880")
 }
