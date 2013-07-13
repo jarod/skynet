@@ -46,8 +46,9 @@ func execAgentCmd(p *net.Packet) {
 	log.Println("exec cmd=", c.GetValue())
 	rawCmd := strings.Split(c.GetValue(), " ")
 	cmd := exec.Command(rawCmd[0], rawCmd[1:]...)
-	err := cmd.Run()
+	data, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Println(err)
 	}
+	log.Println(string(data))
 }
