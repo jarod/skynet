@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	Version = "0.4.130713"
+	Version = "0.4.130725"
 )
 
 var version = flag.Bool("version", false, "show skynet-agent version")

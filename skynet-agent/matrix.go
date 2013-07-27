@@ -40,15 +40,17 @@ func broadcastClients(p *net.Packet) {
 }
 
 func execAgentCmd(p *net.Packet) {
-	c := new(skynet.Pstring)
-	proto.Unmarshal(p.Body, c)
+	go func() {
+		c := new(skynet.Pstring)
+		proto.Unmarshal(p.Body, c)
 
-	log.Println("exec cmd=", c.GetValue())
-	rawCmd := strings.Split(c.GetValue(), " ")
-	cmd := exec.Command(rawCmd[0], rawCmd[1:]...)
-	data, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Println(err)
-	}
-	log.Println(string(data))
+		log.Println("exec cmd=", c.GetValue())
+		rawCmd := strings.Split(c.GetValue(), " ")
+		cmd := exec.Command(rawCmd[0], rawCmd[1:]...)
+		data, err := cmd.CombinedOutput()
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println(string(data))
+	}()
 }
