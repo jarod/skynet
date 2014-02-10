@@ -9,20 +9,20 @@ import (
 	"os"
 )
 
-const (
-	Version = "0.4.130725"
-)
+var VERSION = "0.5-140210"
 
 var version = flag.Bool("version", false, "show skynet-agent version")
 
 var matrix = flag.String("matrix", "127.0.0.1:1860", "address of matrix server")
+
+var optTcpAddr = flag.String("tcp", ":1890", "address to serve tcp")
 
 var (
 	matrixClient *smc.MatrixClient
 )
 
 func bindAgentServer() {
-	addr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:1890")
+	addr, err := net.ResolveTCPAddr("tcp", *optTcpAddr)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -48,7 +48,7 @@ func main() {
 	flag.Parse()
 
 	if *version {
-		fmt.Printf("skynet-agent - %s\n", Version)
+		fmt.Printf("skynet-agent - %s\n", VERSION)
 		os.Exit(0)
 	}
 

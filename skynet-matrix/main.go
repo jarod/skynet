@@ -8,18 +8,18 @@ import (
 	"os"
 )
 
-const (
-	Version = "0.4-130531"
-)
+var VERSION = "0.5-140210"
 
 var version = flag.Bool("version", false, "show skynet-matrix version")
+var optTcpAddr = flag.String("tcp", ":1860", "address to serve tcp")
+var optHttpAddr = flag.String("tcp", ":1880", "address to serve http")
 
 var (
 	httpServer *MatrixHttpServer
 )
 
 func bindMatrixServer() {
-	addr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:1860")
+	addr, err := net.ResolveTCPAddr("tcp", *optTcpAddr)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -44,11 +44,11 @@ func main() {
 	flag.Parse()
 
 	if *version {
-		fmt.Printf("skynet-matrix - %s\n", Version)
+		fmt.Printf("skynet-matrix - %s\n", VERSION)
 		os.Exit(0)
 	}
 	go bindMatrixServer()
 
 	httpServer = NewMatrixHttpServer()
-	httpServer.Startup(":1880")
+	httpServer.Startup(*optHttpAddr)
 }
