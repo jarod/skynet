@@ -12,18 +12,18 @@ import (
 )
 
 var (
-	idMap   map[int32]*AgentClient
+	idMap   map[string]*AgentClient
 	connMap map[*net.TCPConn]*AgentClient
 	mutex   sync.Mutex
 )
 
 func init() {
-	idMap = make(map[int32]*AgentClient)
+	idMap = make(map[string]*AgentClient)
 	connMap = make(map[*net.TCPConn]*AgentClient)
 }
 
 type AgentClient struct {
-	id   int32
+	id   string
 	conn *net.TCPConn
 }
 
@@ -46,20 +46,19 @@ func onClientConnected(conn *net.TCPConn) {
 
 func onClientDisconnected(ac *AgentClient) {
 	delete(connMap, ac.conn)
-	if ac.id >= 0 {
+	if ac.id != "" {
 		delete(idMap, ac.id)
-		m := &skynet.Psint32{
-			Value: proto.Int32(ac.id),
+		m := &skynet.Pstring{
+			Value: proto.String(ac.id),
 		}
 		p, _ := snet.NewMessagePacket(0x0001, m)
 		matrixClient.Write(p)
 	}
-	log.Printf("Client disconnected id=%d,ip=%s", ac.id, ac.conn.RemoteAddr())
+	log.Printf("Client disconnected id=%s,ip=%s", ac.id, ac.conn.RemoteAddr())
 }
 
 func NewAgentClient(conn *net.TCPConn) (ac *AgentClient) {
 	ac = new(AgentClient)
-	ac.id = -1
 	ac.conn = conn
 	return
 }
@@ -80,21 +79,21 @@ func (ac *AgentClient) dispatchClientPacket(p *snet.Packet) {
 }
 
 func (ac *AgentClient) registerClient(p *snet.Packet) {
-	id := new(skynet.Psint32)
+	id := new(skynet.Pstring)
 	proto.Unmarshal(p.Body, id)
 	ac.id = id.GetValue()
 
 	idMap[id.GetValue()] = ac
 	matrixClient.Write(p)
-	log.Printf("New client id=%d,ip=%s", ac.id, ac.conn.RemoteAddr())
+	log.Printf("New client id=%s,ip=%s", ac.id, ac.conn.RemoteAddr())
 }
 
 func (ac *AgentClient) sendToClient(p *snet.Packet) {
-	msg := new(skynet.ToWiredMsg)
+	msg := new(skynet.AppMsg)
 	proto.Unmarshal(p.Body, msg)
 	mutex.Lock()
 	defer mutex.Unlock()
-	if c, ok := idMap[int32(*msg.WiredId)]; ok {
+	if c, ok := idMap[*msg.AppId]; ok {
 		c.Write(p)
 	} else {
 		matrixClient.Write(p)

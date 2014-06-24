@@ -24,7 +24,7 @@ func init() {
 
 type Agent struct {
 	conn     *net.TCPConn
-	clients  []int32
+	clients  []string
 	remoteIp string
 }
 
@@ -61,7 +61,7 @@ func onAgentDisconnected(a *Agent) {
 func NewAgent(conn *net.TCPConn) (ac *Agent) {
 	ac = new(Agent)
 	ac.conn = conn
-	ac.clients = make([]int32, 0)
+	ac.clients = make([]string, 0)
 	return
 }
 
@@ -99,12 +99,12 @@ func (a *Agent) broadcast(p *snet.Packet) {
 	}
 }
 
-func (a *Agent) addClient(id int32) {
+func (a *Agent) addClient(id string) {
 	a.clients = append(a.clients, id)
 	clientCount++
 }
 
-func (a *Agent) delClient(id int32) {
+func (a *Agent) delClient(id string) {
 	for i, v := range a.clients {
 		if v == id {
 			a.clients = append(a.clients[:i], a.clients[i+1:]...)
@@ -114,14 +114,14 @@ func (a *Agent) delClient(id int32) {
 }
 
 func (a *Agent) registerClient(p *snet.Packet) {
-	id := new(skynet.Psint32)
+	id := new(skynet.Pstring)
 	proto.Unmarshal(p.Body, id)
 	a.broadcast(p)
 	a.addClient(id.GetValue())
 }
 
 func (a *Agent) onClientDisconnected(p *snet.Packet) {
-	id := new(skynet.Psint32)
+	id := new(skynet.Pstring)
 	proto.Unmarshal(p.Body, id)
 	a.delClient(id.GetValue())
 

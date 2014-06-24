@@ -13,14 +13,14 @@ message Pstring {
 	optional string value = 3;
 }
 
-message WiredServer {
-	optional uint32 id = 1;
+message AppServer {
+	optional string id = 1;
 	optional string host = 2;
 	optional uint32 port = 3;
 }
 
-message ToWiredMsg {
-	required uint32 wired_id = 1; 
+message AppMsg {
+	required string app_id = 1; 
 	required uint32 head = 2;
 	optional bytes data = 3;
 }

@@ -27,7 +27,7 @@ func (m *MatrixHttpServer) Startup(addr string) {
 }
 
 type client struct {
-	Id int32  `json:"id"`
+	Id string `json:"id"`
 	Ip string `json:"ip"`
 }
 

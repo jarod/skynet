@@ -8,11 +8,11 @@ import (
 	"os"
 )
 
-var VERSION = "0.5-140210"
+var VERSION = "0.6-SNAPSHOT"
 
 var version = flag.Bool("version", false, "show skynet-matrix version")
 var optTcpAddr = flag.String("tcp", ":1860", "address to serve tcp")
-var optHttpAddr = flag.String("tcp", ":1880", "address to serve http")
+var optHttpAddr = flag.String("http", ":1880", "address to serve http")
 
 var (
 	httpServer *MatrixHttpServer

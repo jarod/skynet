@@ -18,13 +18,13 @@ type Psint32 struct {
 	XXX_unrecognized []byte `json:"-"`
 }
 
-func (this *Psint32) Reset()         { *this = Psint32{} }
-func (this *Psint32) String() string { return proto.CompactTextString(this) }
-func (*Psint32) ProtoMessage()       {}
+func (m *Psint32) Reset()         { *m = Psint32{} }
+func (m *Psint32) String() string { return proto.CompactTextString(m) }
+func (*Psint32) ProtoMessage()    {}
 
-func (this *Psint32) GetValue() int32 {
-	if this != nil && this.Value != nil {
-		return *this.Value
+func (m *Psint32) GetValue() int32 {
+	if m != nil && m.Value != nil {
+		return *m.Value
 	}
 	return 0
 }
@@ -34,13 +34,13 @@ type Psint64 struct {
 	XXX_unrecognized []byte `json:"-"`
 }
 
-func (this *Psint64) Reset()         { *this = Psint64{} }
-func (this *Psint64) String() string { return proto.CompactTextString(this) }
-func (*Psint64) ProtoMessage()       {}
+func (m *Psint64) Reset()         { *m = Psint64{} }
+func (m *Psint64) String() string { return proto.CompactTextString(m) }
+func (*Psint64) ProtoMessage()    {}
 
-func (this *Psint64) GetValue() int64 {
-	if this != nil && this.Value != nil {
-		return *this.Value
+func (m *Psint64) GetValue() int64 {
+	if m != nil && m.Value != nil {
+		return *m.Value
 	}
 	return 0
 }
@@ -50,77 +50,77 @@ type Pstring struct {
 	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (this *Pstring) Reset()         { *this = Pstring{} }
-func (this *Pstring) String() string { return proto.CompactTextString(this) }
-func (*Pstring) ProtoMessage()       {}
+func (m *Pstring) Reset()         { *m = Pstring{} }
+func (m *Pstring) String() string { return proto.CompactTextString(m) }
+func (*Pstring) ProtoMessage()    {}
 
-func (this *Pstring) GetValue() string {
-	if this != nil && this.Value != nil {
-		return *this.Value
+func (m *Pstring) GetValue() string {
+	if m != nil && m.Value != nil {
+		return *m.Value
 	}
 	return ""
 }
 
-type WiredServer struct {
-	Id               *uint32 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
+type AppServer struct {
+	Id               *string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
 	Host             *string `protobuf:"bytes,2,opt,name=host" json:"host,omitempty"`
 	Port             *uint32 `protobuf:"varint,3,opt,name=port" json:"port,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (this *WiredServer) Reset()         { *this = WiredServer{} }
-func (this *WiredServer) String() string { return proto.CompactTextString(this) }
-func (*WiredServer) ProtoMessage()       {}
+func (m *AppServer) Reset()         { *m = AppServer{} }
+func (m *AppServer) String() string { return proto.CompactTextString(m) }
+func (*AppServer) ProtoMessage()    {}
 
-func (this *WiredServer) GetId() uint32 {
-	if this != nil && this.Id != nil {
-		return *this.Id
-	}
-	return 0
-}
-
-func (this *WiredServer) GetHost() string {
-	if this != nil && this.Host != nil {
-		return *this.Host
+func (m *AppServer) GetId() string {
+	if m != nil && m.Id != nil {
+		return *m.Id
 	}
 	return ""
 }
 
-func (this *WiredServer) GetPort() uint32 {
-	if this != nil && this.Port != nil {
-		return *this.Port
+func (m *AppServer) GetHost() string {
+	if m != nil && m.Host != nil {
+		return *m.Host
+	}
+	return ""
+}
+
+func (m *AppServer) GetPort() uint32 {
+	if m != nil && m.Port != nil {
+		return *m.Port
 	}
 	return 0
 }
 
-type ToWiredMsg struct {
-	WiredId          *uint32 `protobuf:"varint,1,req,name=wired_id" json:"wired_id,omitempty"`
+type AppMsg struct {
+	AppId            *string `protobuf:"bytes,1,req,name=app_id" json:"app_id,omitempty"`
 	Head             *uint32 `protobuf:"varint,2,req,name=head" json:"head,omitempty"`
 	Data             []byte  `protobuf:"bytes,3,opt,name=data" json:"data,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (this *ToWiredMsg) Reset()         { *this = ToWiredMsg{} }
-func (this *ToWiredMsg) String() string { return proto.CompactTextString(this) }
-func (*ToWiredMsg) ProtoMessage()       {}
+func (m *AppMsg) Reset()         { *m = AppMsg{} }
+func (m *AppMsg) String() string { return proto.CompactTextString(m) }
+func (*AppMsg) ProtoMessage()    {}
 
-func (this *ToWiredMsg) GetWiredId() uint32 {
-	if this != nil && this.WiredId != nil {
-		return *this.WiredId
+func (m *AppMsg) GetAppId() string {
+	if m != nil && m.AppId != nil {
+		return *m.AppId
+	}
+	return ""
+}
+
+func (m *AppMsg) GetHead() uint32 {
+	if m != nil && m.Head != nil {
+		return *m.Head
 	}
 	return 0
 }
 
-func (this *ToWiredMsg) GetHead() uint32 {
-	if this != nil && this.Head != nil {
-		return *this.Head
-	}
-	return 0
-}
-
-func (this *ToWiredMsg) GetData() []byte {
-	if this != nil {
-		return this.Data
+func (m *AppMsg) GetData() []byte {
+	if m != nil {
+		return m.Data
 	}
 	return nil
 }

@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var VERSION = "0.5-140210"
+var VERSION = "0.6-SNAPSHOT"
 
 var version = flag.Bool("version", false, "show skynet-agent version")
 
@@ -54,7 +54,7 @@ func main() {
 
 	mc, err := smc.Dial(*matrix)
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err)
 	}
 	go readMatrix(mc)
 
