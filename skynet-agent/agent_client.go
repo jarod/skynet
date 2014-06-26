@@ -83,7 +83,7 @@ func (ac *AgentClient) registerClient(p *snet.Packet) {
 	proto.Unmarshal(p.Body, id)
 	ac.id = id.GetValue()
 
-	idMap[id.GetValue()] = ac
+	idMap[ac.id] = ac
 	matrixClient.Write(p)
 	log.Printf("New client id=%s,ip=%s", ac.id, ac.conn.RemoteAddr())
 }
@@ -94,8 +94,10 @@ func (ac *AgentClient) sendToClient(p *snet.Packet) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if c, ok := idMap[*msg.AppId]; ok {
+		//log.Printf("Msg local appId:%s,head=%d\n", *msg.AppId, *msg.Head)
 		c.Write(p)
 	} else {
+		//log.Printf("Msg remote appId:%s,head=%d\n", *msg.AppId, *msg.Head)
 		matrixClient.Write(p)
 	}
 }

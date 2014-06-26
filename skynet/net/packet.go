@@ -1,7 +1,6 @@
 package net
 
 import (
-	"bufio"
 	proto "code.google.com/p/goprotobuf/proto"
 	"fmt"
 	"io"
@@ -12,8 +11,7 @@ type Packet struct {
 	Body []byte
 }
 
-func ParsePacket(in io.Reader) (p *Packet, err error) {
-	r := bufio.NewReader(in)
+func ParsePacket(r io.Reader) (p *Packet, err error) {
 	headerbuf := make([]byte, 5)
 	_, err = io.ReadFull(r, headerbuf)
 	if err != nil {
@@ -26,7 +24,6 @@ func ParsePacket(in io.Reader) (p *Packet, err error) {
 
 	head := uint16(headerbuf[3]) << 8
 	head += uint16(headerbuf[4])
-
 	body := make([]byte, blen)
 	_, err = io.ReadFull(r, body)
 	if err != nil {
