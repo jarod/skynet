@@ -2,8 +2,10 @@ package main
 
 import (
 	"code.google.com/p/goprotobuf/proto"
+	"encoding/json"
 	"github.com/jarod/skynet/skynet"
-	smc "github.com/jarod/skynet/skynet/matrix/client"
+	skc "github.com/jarod/skynet/skynet/client"
+	skmc "github.com/jarod/skynet/skynet/matrix/client"
 	"github.com/jarod/skynet/skynet/net"
 	"log"
 	"os/exec"
@@ -11,7 +13,7 @@ import (
 	"time"
 )
 
-func readMatrix(mc *smc.MatrixClient) {
+func readMatrix(mc *skmc.MatrixClient) {
 	matrixClient = mc
 	for {
 		p, err := mc.Read()
@@ -26,11 +28,35 @@ func readMatrix(mc *smc.MatrixClient) {
 
 func dispatchMatrixMessage(p *net.Packet) {
 	switch p.Head {
+	case 0x0000:
+		onMatrixAppInfoUpdate(p)
+	case 0x0001:
+		onMatrixAppDisconnect(p)
 	case 0x0002:
 		execAgentCmd(p)
 	default:
 		broadcastClients(p)
 	}
+}
+
+func onMatrixAppInfoUpdate(p *net.Packet) {
+	info := new(skc.AppInfo)
+	err := json.Unmarshal(p.Body, info)
+	if err != nil {
+		log.Println("onMatrixAppInfoUpdate - ", err)
+		return
+	}
+	appInfos[info.Id] = info
+}
+
+func onMatrixAppDisconnect(p *net.Packet) {
+	id := new(skynet.Pstring)
+	err := proto.Unmarshal(p.Body, id)
+	if err != nil {
+		log.Println("onMatrixAppDisconnect - ", err)
+		return
+	}
+	delete(appInfos, id.GetValue())
 }
 
 func broadcastClients(p *net.Packet) {

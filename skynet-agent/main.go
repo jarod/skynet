@@ -3,13 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	smc "github.com/jarod/skynet/skynet/matrix/client"
+	skmc "github.com/jarod/skynet/skynet/matrix/client"
 	"log"
 	"net"
 	"os"
 )
 
-var VERSION = "0.6-SNAPSHOT"
+var VERSION = "0.9-SNAPSHOT"
 
 var version = flag.Bool("version", false, "show skynet-agent version")
 
@@ -18,7 +18,7 @@ var matrix = flag.String("matrix", "127.0.0.1:1860", "address of matrix server")
 var optTcpAddr = flag.String("tcp", ":1890", "address to serve tcp")
 
 var (
-	matrixClient *smc.MatrixClient
+	matrixClient *skmc.MatrixClient
 )
 
 func bindAgentServer() {
@@ -39,7 +39,7 @@ func bindAgentServer() {
 			continue
 		}
 
-		go onClientConnected(conn)
+		go onAppConnected(conn)
 	}
 	listener.Close()
 }
@@ -52,7 +52,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	mc, err := smc.Dial(*matrix)
+	mc, err := skmc.Dial(*matrix)
 	if err != nil {
 		log.Fatalln(err)
 	}

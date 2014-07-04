@@ -7,6 +7,7 @@ import (
 	"github.com/jarod/skynet/skynet/net"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func init() {
@@ -37,12 +38,15 @@ get running client ids
 @return [{id:ip},{...}]
 */
 func getClientList(w http.ResponseWriter, r *http.Request) {
-	clients := make([]*client, 0, clientCount)
-	for _, v := range ipMap {
-		for _, id := range v.clients {
-			clients = append(clients, &client{Id: id, Ip: v.RemoteIp()})
+	clients := make([]*client, 0, len(apps))
+	for k, v := range apps {
+		parts := strings.Split(v.Agent, ":")
+		if len(parts) != 2 {
+			continue
 		}
+		clients = append(clients, &client{Id: k, Ip: parts[0]})
 	}
+
 	data, err := json.Marshal(clients)
 	if err != nil {
 		log.Println(err)
@@ -60,7 +64,7 @@ send command to agent and run on agent machine
 func execAgentCmd(w http.ResponseWriter, r *http.Request) {
 	ip := r.FormValue("ip")
 	mutex.Lock()
-	agent := ipMap[ip]
+	agent := findAgentByIP(ip)
 	mutex.Unlock()
 	if agent == nil {
 		log.Printf("No agent of ip=%s\n", ip)
