@@ -64,7 +64,7 @@ send command to agent and run on agent machine
 func execAgentCmd(w http.ResponseWriter, r *http.Request) {
 	ip := r.FormValue("ip")
 	mutex.Lock()
-	agent := findAgentByIP(ip)
+	agent := tcpServer.FindAgentByIP(ip)
 	mutex.Unlock()
 	if agent == nil {
 		log.Printf("No agent of ip=%s\n", ip)

@@ -45,7 +45,7 @@ func (mc *MatrixClient) connect() {
 		time.AfterFunc(connDelay*time.Second, func() {
 			conn, err := net.DialTCP("tcp", nil, addr)
 			if err != nil {
-				if connDelay < 128 {
+				if connDelay < 64 {
 					connDelay *= 2
 				}
 				log.Printf("Failed to connect Matrix server %v, reconnect in %d seconds", addr, connDelay)

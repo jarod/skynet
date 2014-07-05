@@ -6,40 +6,57 @@ import (
 	"github.com/jarod/skynet/skynet"
 	skc "github.com/jarod/skynet/skynet/client"
 	skmc "github.com/jarod/skynet/skynet/matrix/client"
-	"github.com/jarod/skynet/skynet/net"
+	skn "github.com/jarod/skynet/skynet/net"
 	"log"
 	"os/exec"
 	"strings"
 	"time"
 )
 
-func readMatrix(mc *skmc.MatrixClient) {
-	matrixClient = mc
+type MatrixClient struct {
+	mc *skmc.MatrixClient
+}
+
+func DialMatrix() (*MatrixClient, error) {
+	mc, err := skmc.Dial(*matrix)
+	if err != nil {
+		return nil, err
+	}
+	c := &MatrixClient{mc: mc}
+	go c.readMatrix()
+	return c, nil
+}
+
+func (m *MatrixClient) readMatrix() {
+	time.Sleep(time.Second)
 	for {
-		p, err := mc.Read()
+		p, err := m.mc.Read()
 		if err != nil {
 			log.Printf("readMatrix err=%v", err)
-			time.Sleep(16 * time.Second)
-			continue
+			break
 		}
-		dispatchMatrixMessage(p)
+		m.dispatchMessage(p)
 	}
 }
 
-func dispatchMatrixMessage(p *net.Packet) {
+func (m *MatrixClient) Write(p *skn.Packet) {
+	m.mc.Write(p)
+}
+
+func (m *MatrixClient) dispatchMessage(p *skn.Packet) {
 	switch p.Head {
 	case 0x0000:
-		onMatrixAppInfoUpdate(p)
+		m.onMatrixAppInfoUpdate(p)
 	case 0x0001:
-		onMatrixAppDisconnect(p)
+		m.onMatrixAppDisconnect(p)
 	case 0x0002:
-		execAgentCmd(p)
+		m.execAgentCmd(p)
 	default:
-		broadcastClients(p)
+		tcpServer.BroadcastApps(p)
 	}
 }
 
-func onMatrixAppInfoUpdate(p *net.Packet) {
+func (m *MatrixClient) onMatrixAppInfoUpdate(p *skn.Packet) {
 	info := new(skc.AppInfo)
 	err := json.Unmarshal(p.Body, info)
 	if err != nil {
@@ -49,7 +66,7 @@ func onMatrixAppInfoUpdate(p *net.Packet) {
 	appInfos[info.Id] = info
 }
 
-func onMatrixAppDisconnect(p *net.Packet) {
+func (m *MatrixClient) onMatrixAppDisconnect(p *skn.Packet) {
 	id := new(skynet.Pstring)
 	err := proto.Unmarshal(p.Body, id)
 	if err != nil {
@@ -59,13 +76,7 @@ func onMatrixAppDisconnect(p *net.Packet) {
 	delete(appInfos, id.GetValue())
 }
 
-func broadcastClients(p *net.Packet) {
-	for _, v := range connMap {
-		v.Write(p)
-	}
-}
-
-func execAgentCmd(p *net.Packet) {
+func (m *MatrixClient) execAgentCmd(p *skn.Packet) {
 	go func() {
 		c := new(skynet.Pstring)
 		proto.Unmarshal(p.Body, c)

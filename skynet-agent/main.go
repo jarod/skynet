@@ -3,9 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	skmc "github.com/jarod/skynet/skynet/matrix/client"
 	"log"
-	"net"
 	"os"
 )
 
@@ -16,33 +14,12 @@ var version = flag.Bool("version", false, "show skynet-agent version")
 var matrix = flag.String("matrix", "127.0.0.1:1860", "address of matrix server")
 
 var optTcpAddr = flag.String("tcp", ":1890", "address to serve tcp")
+var optHttpAddr = flag.String("http", ":1891", "address to serve http")
 
 var (
-	matrixClient *skmc.MatrixClient
+	tcpServer    *TcpServer
+	matrixClient *MatrixClient
 )
-
-func bindAgentServer() {
-	addr, err := net.ResolveTCPAddr("tcp", *optTcpAddr)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	listener, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Printf("Listening on %s", addr.String())
-
-	for {
-		conn, err := listener.AcceptTCP()
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		go onAppConnected(conn)
-	}
-	listener.Close()
-}
 
 func main() {
 	flag.Parse()
@@ -51,12 +28,14 @@ func main() {
 		fmt.Printf("skynet-agent - %s\n", VERSION)
 		os.Exit(0)
 	}
-
-	mc, err := skmc.Dial(*matrix)
+	var err error
+	matrixClient, err = DialMatrix()
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("MatrixClient: ", err)
+		return
 	}
-	go readMatrix(mc)
-
-	bindAgentServer()
+	httpServer := NewHttpServer()
+	go httpServer.ListenAndServe(*optHttpAddr)
+	tcpServer = NewTcpServer()
+	tcpServer.ListenAndServe(*optTcpAddr)
 }

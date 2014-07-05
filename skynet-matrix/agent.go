@@ -14,22 +14,12 @@ import (
 )
 
 var (
-	agents []*Agent
-	mutex  sync.Mutex
-	apps   map[string]*skc.AppInfo // id->info
+	mutex sync.Mutex
+	apps  map[string]*skc.AppInfo // id->info
 )
 
 func init() {
-
-}
-
-func findAgentByIP(ip string) *Agent {
-	for _, a := range agents {
-		if a.remoteIp == ip {
-			return a
-		}
-	}
-	return nil
+	apps = make(map[string]*skc.AppInfo)
 }
 
 type Agent struct {
@@ -37,45 +27,10 @@ type Agent struct {
 	remoteIp string
 }
 
-func onAgentConnected(conn *net.TCPConn) {
-	ag := NewAgent(conn)
-
-	mutex.Lock()
-	agents = append(agents, ag)
-	mutex.Unlock()
-
-	log.Printf("Agent connected %s\n", ag.RemoteIp())
-	for {
-		p, err := snet.ParsePacket(conn)
-		if err != nil {
-			if err != io.EOF {
-				log.Println(err)
-			}
-			break
-		}
-		ag.dispatchAgentPacket(p)
-	}
-	ag.onDisconnected()
-	conn.Close()
-}
-
 func NewAgent(conn *net.TCPConn) (ac *Agent) {
 	ac = new(Agent)
 	ac.conn = conn
 	return
-}
-
-func (a *Agent) onDisconnected() {
-	mutex.Lock()
-	for i, agent := range agents {
-		if agent == a {
-			agents[i], agents = agents[len(agents)-1], agents[:len(agents)-1]
-			break
-		}
-	}
-	mutex.Unlock()
-
-	log.Printf("Agent disconnected. ip=%s\n", a.RemoteIp())
 }
 
 func (a *Agent) RemoteIp() string {
@@ -101,17 +56,9 @@ func (a *Agent) dispatchAgentPacket(p *snet.Packet) {
 	case 0x0001:
 		a.onAppDisconnected(p)
 	default:
-		a.broadcast(p)
+		tcpServer.Broadcast(p)
 	}
 	log.Printf("dispatchAgentPacket - %v\n", p)
-}
-
-func (a *Agent) broadcast(p *snet.Packet) {
-	mutex.Lock()
-	defer mutex.Unlock()
-	for _, v := range agents {
-		v.Write(p)
-	}
 }
 
 func (a *Agent) updateAppInfo(p *snet.Packet) {
@@ -128,7 +75,7 @@ func (a *Agent) updateAppInfo(p *snet.Packet) {
 		log.Println("updateAppInfo - ", err)
 		return
 	}
-	a.broadcast(p)
+	tcpServer.Broadcast(p)
 }
 
 func (a *Agent) onAppDisconnected(p *snet.Packet) {
@@ -139,5 +86,5 @@ func (a *Agent) onAppDisconnected(p *snet.Packet) {
 		return
 	}
 	delete(apps, id.GetValue())
-	a.broadcast(p)
+	tcpServer.Broadcast(p)
 }
