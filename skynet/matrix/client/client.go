@@ -21,7 +21,9 @@ func Dial(serverAddr string) (mc *MatrixClient, err error) {
 	if err != nil {
 		return
 	}
-	go mc.connect()
+	doneCh := make(chan bool)
+	go mc.connect(doneCh)
+	<-doneCh
 	return
 }
 
@@ -38,14 +40,15 @@ func newMatrixClient(serverAddr string) (mc *MatrixClient, err error) {
 	return
 }
 
-func (mc *MatrixClient) connect() {
+func (mc *MatrixClient) connect(doneCh chan bool) {
 	connDelay := time.Duration(1)
+	first := true
 	for {
 		addr := <-mc.connCh
 		time.AfterFunc(connDelay*time.Second, func() {
 			conn, err := net.DialTCP("tcp", nil, addr)
 			if err != nil {
-				if connDelay < 64 {
+				if connDelay < 32 {
 					connDelay *= 2
 				}
 				log.Printf("Failed to connect Matrix server %v, reconnect in %d seconds", addr, connDelay)
@@ -53,7 +56,11 @@ func (mc *MatrixClient) connect() {
 			} else {
 				connDelay = 1
 				mc.conn = conn
-				log.Printf("Connected to Matrix on %s", conn.RemoteAddr())
+				log.Printf("Connected to Matrix[%s]", conn.RemoteAddr())
+				if first {
+					first = false
+					doneCh <- true
+				}
 			}
 		})
 	}

@@ -30,6 +30,13 @@ func (h *HttpServer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+/*
+StatusCode: 200=OK, 5XX=errors
+200:
+  Data: app info list
+5xx:
+  Msg: error message
+*/
 func (h *HttpServer) findApps(w http.ResponseWriter, req *http.Request) {
 	err := req.ParseForm()
 	if err != nil {
@@ -42,9 +49,7 @@ func (h *HttpServer) findApps(w http.ResponseWriter, req *http.Request) {
 	for k, v := range appInfos {
 		matched, err := regexp.MatchString(pattern, k)
 		if err != nil {
-			enc.Encode(map[string]interface{}{
-				"Code": 1,
-				"Msg":  err.Error()})
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		log.Printf("k:%s,v:%v,pattern:%s\n", k, v, pattern)
@@ -54,7 +59,6 @@ func (h *HttpServer) findApps(w http.ResponseWriter, req *http.Request) {
 	}
 
 	err = enc.Encode(map[string]interface{}{
-		"Code": 0,
 		"Data": infos})
 	if err != nil {
 		log.Println("agent http: findApps - ", err)

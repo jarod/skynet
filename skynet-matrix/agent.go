@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	mutex sync.Mutex
-	apps  map[string]*skc.AppInfo // id->info
+	mutex    sync.Mutex
+	appInfos map[string]*skc.AppInfo // id->info
 )
 
 func init() {
-	apps = make(map[string]*skc.AppInfo)
+	appInfos = make(map[string]*skc.AppInfo)
 }
 
 type Agent struct {
@@ -69,7 +69,7 @@ func (a *Agent) updateAppInfo(p *snet.Packet) {
 		return
 	}
 	info.Agent = a.conn.RemoteAddr().String()
-	apps[info.Id] = info
+	appInfos[info.Id] = info
 	p.Body, err = json.Marshal(info)
 	if err != nil {
 		log.Println("updateAppInfo - ", err)
@@ -85,6 +85,6 @@ func (a *Agent) onAppDisconnected(p *snet.Packet) {
 		log.Println("onAppDisconnected - ", err)
 		return
 	}
-	delete(apps, id.GetValue())
+	delete(appInfos, id.GetValue())
 	tcpServer.Broadcast(p)
 }

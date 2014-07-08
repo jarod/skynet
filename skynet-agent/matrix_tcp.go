@@ -10,15 +10,14 @@ import (
 	"log"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 type MatrixClient struct {
 	mc *skmc.MatrixClient
 }
 
-func DialMatrix() (*MatrixClient, error) {
-	mc, err := skmc.Dial(*matrix)
+func DialMatrix(addr string) (*MatrixClient, error) {
+	mc, err := skmc.Dial(addr)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +27,6 @@ func DialMatrix() (*MatrixClient, error) {
 }
 
 func (m *MatrixClient) readMatrix() {
-	time.Sleep(time.Second)
 	for {
 		p, err := m.mc.Read()
 		if err != nil {

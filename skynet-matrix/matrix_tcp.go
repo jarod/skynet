@@ -75,11 +75,11 @@ func (t *TcpServer) onDisconnected(a *Agent) {
 	log.Printf("Agent disconnected. ip=%s\n", a.RemoteIp())
 }
 
-func (t *TcpServer) FindAgentByIP(ip string) *Agent {
+func (t *TcpServer) FindAgentByAddr(addr string) *Agent {
 	t.Lock()
 	defer t.Unlock()
 	for _, a := range t.agents {
-		if a.remoteIp == ip {
+		if a.conn.RemoteAddr().String() == addr {
 			return a
 		}
 	}

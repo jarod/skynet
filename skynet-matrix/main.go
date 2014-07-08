@@ -10,10 +10,10 @@ var VERSION = "0.9-SNAPSHOT"
 
 var version = flag.Bool("version", false, "show skynet-matrix version")
 var optTcpAddr = flag.String("tcp", ":1860", "address to serve tcp")
-var optHttpAddr = flag.String("http", ":1880", "address to serve http")
+var optHttpAddr = flag.String("http", ":1861", "address to serve http")
 
 var (
-	httpServer *MatrixHttpServer
+	httpServer *HttpServer
 	tcpServer  *TcpServer
 )
 
@@ -28,6 +28,6 @@ func main() {
 	tcpServer = NewTcpServer()
 	go tcpServer.ListenAndServe(*optTcpAddr)
 
-	httpServer = NewMatrixHttpServer()
-	httpServer.Startup(*optHttpAddr)
+	httpServer = NewHttpServer()
+	httpServer.ListenAndServe(*optHttpAddr)
 }
