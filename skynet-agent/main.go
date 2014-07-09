@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	sklog "github.com/jarod/skynet/skynet/log"
 	"log"
 	"os"
 )
@@ -10,6 +11,7 @@ import (
 var VERSION = "0.9-SNAPSHOT"
 
 var version = flag.Bool("version", false, "show skynet-agent version")
+var optLogFile = flag.String("log", "", "log file location, rotate on SIGUSR1")
 
 var optMatrixAddr = flag.String("matrix", "127.0.0.1:1860", "address of matrix server")
 var optMatrixUrl = flag.String("matrix-url", "http://127.0.0.1:1861/", "url of matrix http server")
@@ -30,6 +32,9 @@ func main() {
 		fmt.Printf("skynet-agent - %s\n", VERSION)
 		os.Exit(0)
 	}
+
+	sklog.RegisterRotate(*optLogFile)
+
 	var err error
 	matrixClient, err = DialMatrix(*optMatrixAddr)
 	if err != nil {
