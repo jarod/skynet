@@ -26,7 +26,7 @@ func (t *TcpServer) ListenAndServe(laddr string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Printf("Listening on %s", addr.String())
+	log.Println("Listening on", addr)
 
 	for {
 		conn, err := listener.AcceptTCP()
@@ -42,11 +42,11 @@ func (t *TcpServer) ListenAndServe(laddr string) {
 func (t *TcpServer) onConnected(conn *net.TCPConn) {
 	ag := NewAgent(conn)
 
-	mutex.Lock()
+	t.Lock()
 	t.agents = append(t.agents, ag)
-	mutex.Unlock()
+	t.Unlock()
 
-	log.Printf("Agent connected %s\n", ag.RemoteIp())
+	log.Println("Agent connected", conn.RemoteAddr())
 	for {
 		p, err := skn.ParsePacket(conn)
 		if err != nil {

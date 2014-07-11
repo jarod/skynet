@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/jarod/skynet/skynet"
 	sklog "github.com/jarod/skynet/skynet/log"
 	"os"
+	"sync"
 )
 
 var VERSION = "0.9-SNAPSHOT"
@@ -18,7 +20,16 @@ var optHttpAddr = flag.String("http", ":1861", "address to serve http")
 var (
 	httpServer *HttpServer
 	tcpServer  *TcpServer
+
+	mutex    sync.Mutex
+	appInfos map[string]*skynet.AppInfo // id->info
+
+	appInfoLoaded uint32
 )
+
+func init() {
+	appInfos = make(map[string]*skynet.AppInfo)
+}
 
 func main() {
 	flag.Parse()

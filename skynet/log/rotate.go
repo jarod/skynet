@@ -43,7 +43,7 @@ func updateLogFile(fn string) {
 	}
 
 	var err error
-	file, err = os.OpenFile(fn, os.O_WRONLY|os.O_CREATE, 0644)
+	file, err = os.OpenFile(fn, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		os.Stderr.WriteString(fmt.Sprintf("updateLogFile(%s) - %s\n", fn, err))
 		return

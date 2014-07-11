@@ -5,7 +5,6 @@ import (
 	"code.google.com/p/goprotobuf/proto"
 	"encoding/json"
 	"github.com/jarod/skynet/skynet"
-	skc "github.com/jarod/skynet/skynet/client"
 	skn "github.com/jarod/skynet/skynet/net"
 	"io"
 	"log"
@@ -97,20 +96,22 @@ func (mc *MatrixClient) Write(p *skn.Packet) {
 }
 
 func (m *MatrixClient) dispatchMessage(p *skn.Packet) {
-	switch p.Head {
-	case 0x0000:
+	switch skynet.SkynetMsg(p.Head) {
+	case skynet.SkynetMsg_SM_APP_INFO:
 		m.onAppInfoUpdate(p)
-	case 0x0001:
+	case skynet.SkynetMsg_SM_APP_DISCONNECTED:
 		m.onAppDisconnect(p)
-	case 0x0002:
+	case skynet.SkynetMsg_SM_AGENT_EXECUTE_CMD:
 		m.execAgentCmd(p)
+	case skynet.SkynetMsg_SM_AGENT_FIND_APPS:
+		m.findApps(p)
 	default:
 		tcpServer.BroadcastApps(p)
 	}
 }
 
 func (m *MatrixClient) onAppInfoUpdate(p *skn.Packet) {
-	info := new(skc.AppInfo)
+	info := new(skynet.AppInfo)
 	err := json.Unmarshal(p.Body, info)
 	if err != nil {
 		log.Println("onAppInfoUpdate - ", err)
@@ -143,4 +144,24 @@ func (m *MatrixClient) execAgentCmd(p *skn.Packet) {
 		}
 		log.Println(string(data))
 	}()
+}
+
+func (m *MatrixClient) findApps(p *skn.Packet) {
+	pattern := new(skynet.Pstring)
+	err := proto.Unmarshal(p.Body, pattern)
+	if err != nil {
+		log.Println("findApps - ", err)
+		return
+	}
+	infos, err := FindApps(pattern.GetValue())
+	if err != nil {
+		log.Println("findApps - ", err)
+		return
+	}
+	p.Body, err = json.Marshal(infos)
+	if err != nil {
+		log.Println("findApps - ", err)
+		return
+	}
+	m.Write(p)
 }

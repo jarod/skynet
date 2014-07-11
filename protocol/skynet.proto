@@ -19,8 +19,26 @@ message AppServer {
 	optional uint32 port = 3;
 }
 
+enum SkynetMsg {
+	SM_APP_INFO = 0x0000;
+	SM_APP_DISCONNECTED = 0x0001;
+
+	SM_SEND_TO_APP = 0x0010;
+
+	SM_AGENT_EXECUTE_CMD = 0x0020;
+	SM_AGENT_FIND_APPS = 0x0021;
+}
+
 message AppMsg {
 	required string app_id = 1; 
 	required uint32 head = 2;
 	optional bytes data = 3;
 }
+
+// 0x0000 update app info
+// 0x0001 app disconnected
+
+// 0x0010 send message to app
+
+// 0x0020 request agent to execute a command
+// 0x0021 request agent to send AppInfos match a pattern to matrix

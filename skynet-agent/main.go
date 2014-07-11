@@ -20,7 +20,9 @@ var optTcpAddr = flag.String("tcp", ":1890", "address to serve tcp")
 var optHttpAddr = flag.String("http", ":1891", "address to serve http")
 
 var (
+	idAddr           string
 	tcpServer        *TcpServer
+	httpServer       *HttpServer
 	matrixClient     *MatrixClient
 	matrixHttpClient *MatrixHttpClient
 )
@@ -35,6 +37,9 @@ func main() {
 
 	sklog.RegisterRotate(*optLogFile)
 
+	httpServer = NewHttpServer()
+	go httpServer.ListenAndServe(*optHttpAddr)
+
 	var err error
 	matrixClient, err = DialMatrix(*optMatrixAddr)
 	if err != nil {
@@ -44,8 +49,6 @@ func main() {
 	matrixHttpClient = NewMatrixHttpClient(*optMatrixUrl)
 	fetchAppInfos()
 
-	httpServer := NewHttpServer()
-	go httpServer.ListenAndServe(*optHttpAddr)
 	tcpServer = NewTcpServer()
 	tcpServer.ListenAndServe(*optTcpAddr)
 }

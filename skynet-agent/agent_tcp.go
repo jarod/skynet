@@ -86,7 +86,11 @@ func (as *TcpServer) BroadcastApps(p *skn.Packet) {
 
 func (as *TcpServer) SendToApp(p *skn.Packet) {
 	msg := new(skynet.AppMsg)
-	proto.Unmarshal(p.Body, msg)
+	err := proto.Unmarshal(p.Body, msg)
+	if err != nil {
+		log.Println("SendToApp - ", err)
+		return
+	}
 	as.Lock()
 	defer as.Unlock()
 	if c, ok := as.appIdMap[*msg.AppId]; ok {

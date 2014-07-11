@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	skc "github.com/jarod/skynet/skynet/client"
 	"log"
 	"net/http"
-	"regexp"
 )
 
 type HttpServer struct {
@@ -44,20 +42,12 @@ func (h *HttpServer) findApps(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	pattern := req.FormValue("pattern")
-	var infos []*skc.AppInfo
-	enc := json.NewEncoder(w)
-	for k, v := range appInfos {
-		matched, err := regexp.MatchString(pattern, k)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		log.Printf("k:%s,v:%v,pattern:%s\n", k, v, pattern)
-		if matched {
-			infos = append(infos, v)
-		}
+	infos, err := FindApps(pattern)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-
+	enc := json.NewEncoder(w)
 	err = enc.Encode(map[string]interface{}{
 		"Data": infos})
 	if err != nil {

@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	skc "github.com/jarod/skynet/skynet/client"
+	"github.com/jarod/skynet/skynet"
 	"log"
 	"net/http"
 )
@@ -15,7 +15,7 @@ func NewMatrixHttpClient(urlBase string) *MatrixHttpClient {
 	return &MatrixHttpClient{urlBase: urlBase}
 }
 
-func (m *MatrixHttpClient) FindApps(pattern string) []*skc.AppInfo {
+func (m *MatrixHttpClient) FindApps(pattern string) []*skynet.AppInfo {
 	resp, err := http.Get(m.urlBase + "matrix/apps?pattern=" + pattern)
 	if err != nil {
 		log.Println("FindApps - ", err)
@@ -26,7 +26,7 @@ func (m *MatrixHttpClient) FindApps(pattern string) []*skc.AppInfo {
 		return nil
 	}
 	ret := struct {
-		Data []*skc.AppInfo
+		Data []*skynet.AppInfo
 	}{}
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&ret)

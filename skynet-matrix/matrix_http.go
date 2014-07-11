@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/goprotobuf/proto"
 	"encoding/json"
 	"github.com/jarod/skynet/skynet"
-	skc "github.com/jarod/skynet/skynet/client"
 	"github.com/jarod/skynet/skynet/net"
 	"log"
 	"net/http"
@@ -42,7 +41,7 @@ func (h *HttpServer) findApps(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	pattern := req.FormValue("pattern")
-	var infos []*skc.AppInfo
+	var infos []*skynet.AppInfo
 	enc := json.NewEncoder(w)
 	for k, v := range appInfos {
 		matched, err := regexp.MatchString(pattern, k)
@@ -81,7 +80,7 @@ func (h *HttpServer) execAgentCmd(w http.ResponseWriter, r *http.Request) {
 	}
 	cmd := r.FormValue("cmd")
 	log.Printf("exec agent command - agent=%s,cmd=%s,\n", addr, cmd)
-	p, err := net.NewMessagePacket(0x0002, &skynet.Pstring{Value: proto.String(cmd)})
+	p, err := net.NewMessagePacket(0x0020, &skynet.Pstring{Value: proto.String(cmd)})
 	if err != nil {
 		log.Println(err)
 		return

@@ -3,19 +3,35 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	skc "github.com/jarod/skynet/skynet/client"
+	"github.com/jarod/skynet/skynet"
 	skn "github.com/jarod/skynet/skynet/net"
 	"io"
 	"log"
 	"net"
+	"regexp"
 )
 
 var (
-	appInfos map[string]*skc.AppInfo
+	appInfos map[string]*skynet.AppInfo
 )
 
 func init() {
-	appInfos = make(map[string]*skc.AppInfo)
+	appInfos = make(map[string]*skynet.AppInfo)
+}
+
+func FindApps(pattern string) (infos []*skynet.AppInfo, err error) {
+	for k, v := range appInfos {
+		matched := false
+		matched, err = regexp.MatchString(pattern, k)
+		if err != nil {
+			return
+		}
+		//log.Printf("k:%s,v:%v,pattern:%s\n", k, v, pattern)
+		if matched {
+			infos = append(infos, v)
+		}
+	}
+	return
 }
 
 type App struct {
@@ -35,10 +51,10 @@ func (ac *App) Write(p *skn.Packet) {
 }
 
 func (ac *App) dispatchAppPacket(p *skn.Packet) {
-	switch p.Head {
-	case 0x0000:
+	switch skynet.SkynetMsg(p.Head) {
+	case skynet.SkynetMsg_SM_APP_INFO:
 		ac.updateAppInfo(p)
-	case 0x0010:
+	case skynet.SkynetMsg_SM_SEND_TO_APP:
 		tcpServer.SendToApp(p)
 	default:
 		matrixClient.Write(p)
@@ -47,12 +63,13 @@ func (ac *App) dispatchAppPacket(p *skn.Packet) {
 }
 
 func (a *App) updateAppInfo(p *skn.Packet) {
-	info := new(skc.AppInfo)
+	info := new(skynet.AppInfo)
 	err := json.Unmarshal(p.Body, info)
 	if err != nil {
 		log.Println("app: updateAppInfo - ", err)
 		return
 	}
 	a.id = info.Id
+	tcpServer.appIdMap[a.id] = a
 	matrixClient.Write(p)
 }

@@ -13,6 +13,48 @@ var _ = proto.Marshal
 var _ = &json.SyntaxError{}
 var _ = math.Inf
 
+type SkynetMsg int32
+
+const (
+	SkynetMsg_SM_APP_INFO          SkynetMsg = 0
+	SkynetMsg_SM_APP_DISCONNECTED  SkynetMsg = 1
+	SkynetMsg_SM_SEND_TO_APP       SkynetMsg = 16
+	SkynetMsg_SM_AGENT_EXECUTE_CMD SkynetMsg = 32
+	SkynetMsg_SM_AGENT_FIND_APPS   SkynetMsg = 33
+)
+
+var SkynetMsg_name = map[int32]string{
+	0:  "SM_APP_INFO",
+	1:  "SM_APP_DISCONNECTED",
+	16: "SM_SEND_TO_APP",
+	32: "SM_AGENT_EXECUTE_CMD",
+	33: "SM_AGENT_FIND_APPS",
+}
+var SkynetMsg_value = map[string]int32{
+	"SM_APP_INFO":          0,
+	"SM_APP_DISCONNECTED":  1,
+	"SM_SEND_TO_APP":       16,
+	"SM_AGENT_EXECUTE_CMD": 32,
+	"SM_AGENT_FIND_APPS":   33,
+}
+
+func (x SkynetMsg) Enum() *SkynetMsg {
+	p := new(SkynetMsg)
+	*p = x
+	return p
+}
+func (x SkynetMsg) String() string {
+	return proto.EnumName(SkynetMsg_name, int32(x))
+}
+func (x *SkynetMsg) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(SkynetMsg_value, data, "SkynetMsg")
+	if err != nil {
+		return err
+	}
+	*x = SkynetMsg(value)
+	return nil
+}
+
 type Psint32 struct {
 	Value            *int32 `protobuf:"zigzag32,1,opt,name=value" json:"value,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
@@ -126,4 +168,5 @@ func (m *AppMsg) GetData() []byte {
 }
 
 func init() {
+	proto.RegisterEnum("skynet.SkynetMsg", SkynetMsg_name, SkynetMsg_value)
 }

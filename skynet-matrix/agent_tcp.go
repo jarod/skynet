@@ -5,22 +5,12 @@ import (
 	"code.google.com/p/goprotobuf/proto"
 	"encoding/json"
 	"github.com/jarod/skynet/skynet"
-	skc "github.com/jarod/skynet/skynet/client"
-	snet "github.com/jarod/skynet/skynet/net"
+	skn "github.com/jarod/skynet/skynet/net"
 	"io"
 	"log"
 	"net"
-	"sync"
+	"sync/atomic"
 )
-
-var (
-	mutex    sync.Mutex
-	appInfos map[string]*skc.AppInfo // id->info
-)
-
-func init() {
-	appInfos = make(map[string]*skc.AppInfo)
-}
 
 type Agent struct {
 	conn     *net.TCPConn
@@ -44,25 +34,35 @@ func (a *Agent) RemoteIp() string {
 	return a.remoteIp
 }
 
-func (ac *Agent) Write(p *snet.Packet) {
+func (ac *Agent) Write(p *skn.Packet) {
 	data := p.Encode()
 	io.Copy(ac.conn, bytes.NewReader(data))
 }
 
-func (a *Agent) dispatchAgentPacket(p *snet.Packet) {
-	switch p.Head {
-	case 0x0000:
+func (a *Agent) RequestAppInfos() {
+	if !atomic.CompareAndSwapUint32(&appInfoLoaded, 0, 1) {
+		return
+	}
+	p := skn.NewPacket(0x0021, []byte("^.*$"))
+	a.Write(p)
+}
+
+func (a *Agent) dispatchAgentPacket(p *skn.Packet) {
+	switch skynet.SkynetMsg(p.Head) {
+	case skynet.SkynetMsg_SM_APP_INFO:
 		a.updateAppInfo(p)
-	case 0x0001:
+	case skynet.SkynetMsg_SM_APP_DISCONNECTED:
 		a.onAppDisconnected(p)
+	case skynet.SkynetMsg_SM_AGENT_FIND_APPS:
+		a.responseAppInfos(p)
 	default:
 		tcpServer.Broadcast(p)
 	}
 	log.Printf("dispatchAgentPacket - %v\n", p)
 }
 
-func (a *Agent) updateAppInfo(p *snet.Packet) {
-	info := new(skc.AppInfo)
+func (a *Agent) updateAppInfo(p *skn.Packet) {
+	info := new(skynet.AppInfo)
 	err := json.Unmarshal(p.Body, info)
 	if err != nil {
 		log.Println("updateAppInfo - ", err)
@@ -78,7 +78,7 @@ func (a *Agent) updateAppInfo(p *snet.Packet) {
 	tcpServer.Broadcast(p)
 }
 
-func (a *Agent) onAppDisconnected(p *snet.Packet) {
+func (a *Agent) onAppDisconnected(p *skn.Packet) {
 	id := new(skynet.Pstring)
 	err := proto.Unmarshal(p.Body, id)
 	if err != nil {
@@ -87,4 +87,13 @@ func (a *Agent) onAppDisconnected(p *snet.Packet) {
 	}
 	delete(appInfos, id.GetValue())
 	tcpServer.Broadcast(p)
+}
+
+func (a *Agent) responseAppInfos(p *skn.Packet) {
+	var infos []*skynet.AppInfo
+	err := json.Unmarshal(p.Body, infos)
+	if err != nil {
+		log.Println("responseAppInfos - ", err)
+		return
+	}
 }
