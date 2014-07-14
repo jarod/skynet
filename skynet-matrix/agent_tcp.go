@@ -43,7 +43,7 @@ func (a *Agent) RequestAppInfos() {
 	if !atomic.CompareAndSwapUint32(&appInfoLoaded, 0, 1) {
 		return
 	}
-	p := skn.NewPacket(0x0021, []byte("^.*$"))
+	p := skn.NewPacket(uint16(skynet.SkynetMsg_SM_AGENT_FIND_APPS), []byte("^.*$"))
 	a.Write(p)
 }
 
@@ -91,9 +91,17 @@ func (a *Agent) onAppDisconnected(p *skn.Packet) {
 
 func (a *Agent) responseAppInfos(p *skn.Packet) {
 	var infos []*skynet.AppInfo
-	err := json.Unmarshal(p.Body, infos)
+	err := json.Unmarshal(p.Body, &infos)
 	if err != nil {
 		log.Println("responseAppInfos - ", err)
 		return
+	}
+	log.Println("Load app info from agent", infos)
+	for _, info := range infos {
+		_, exists := appInfos[info.Id]
+		if exists {
+			continue
+		}
+		appInfos[info.Id] = info
 	}
 }

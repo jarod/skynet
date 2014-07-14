@@ -47,6 +47,7 @@ func (t *TcpServer) onConnected(conn *net.TCPConn) {
 	t.Unlock()
 
 	log.Println("Agent connected", conn.RemoteAddr())
+	ag.RequestAppInfos()
 	for {
 		p, err := skn.ParsePacket(conn)
 		if err != nil {

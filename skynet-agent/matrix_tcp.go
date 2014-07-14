@@ -133,29 +133,31 @@ func (m *MatrixClient) onAppDisconnect(p *skn.Packet) {
 func (m *MatrixClient) execAgentCmd(p *skn.Packet) {
 	go func() {
 		c := new(skynet.Pstring)
-		proto.Unmarshal(p.Body, c)
-
+		err := proto.Unmarshal(p.Body, c)
+		if err != nil {
+			log.Println("execAgentCmd - ", err)
+			return
+		}
 		log.Println("execAgentCmd", c.GetValue())
 		rawCmd := strings.Split(c.GetValue(), " ")
 		cmd := exec.Command(rawCmd[0], rawCmd[1:]...)
 		data, err := cmd.CombinedOutput()
 		if err != nil {
 			log.Println(err)
+			return
 		}
 		log.Println(string(data))
 	}()
 }
 
 func (m *MatrixClient) findApps(p *skn.Packet) {
-	pattern := new(skynet.Pstring)
-	err := proto.Unmarshal(p.Body, pattern)
+	pattern := string(p.Body)
+	infos, err := FindApps(pattern)
 	if err != nil {
 		log.Println("findApps - ", err)
 		return
 	}
-	infos, err := FindApps(pattern.GetValue())
-	if err != nil {
-		log.Println("findApps - ", err)
+	if len(infos) < 1 {
 		return
 	}
 	p.Body, err = json.Marshal(infos)
