@@ -50,7 +50,7 @@ func NewMessagePacket(head uint16, pb proto.Message) (*Packet, error) {
 }
 
 func (p *Packet) String() string {
-	return fmt.Sprintf("head=%d,len=%d", p.Head, len(p.Body))
+	return fmt.Sprintf("head=%02X,len=%d", p.Head, len(p.Body))
 }
 
 /* TODO performance */

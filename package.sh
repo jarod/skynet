@@ -1,5 +1,5 @@
-VER=0.9-140714
-OS="linux"
+VER=0.9-140730
+OS="linux windows"
 ARCH="amd64 386"
 
 dir="`pwd`"

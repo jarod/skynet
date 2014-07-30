@@ -11,7 +11,7 @@ import (
 var VERSION = "0.9-SNAPSHOT"
 
 var version = flag.Bool("version", false, "show skynet-agent version")
-var optLogFile = flag.String("log", "", "log file location, rotate on SIGUSR1")
+var optLogFile = flag.String("log", "", "log file location, reopen on signal SIGUSR1")
 
 var optMatrixAddr = flag.String("matrix", "127.0.0.1:1860", "address of matrix server")
 var optMatrixUrl = flag.String("matrix-url", "http://127.0.0.1:1861/", "url of matrix http server")
@@ -35,7 +35,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	sklog.RegisterRotate(*optLogFile)
+	sklog.SetLogFile(*optLogFile)
 
 	httpServer = NewHttpServer()
 	go httpServer.ListenAndServe(*optHttpAddr)

@@ -86,13 +86,14 @@ func (m *MatrixClient) onConnected(conn *net.TCPConn) {
 }
 
 func (mc *MatrixClient) Write(p *skn.Packet) {
-	data := p.Encode()
+	r := bytes.NewReader(p.Encode())
 	mc.cond.L.Lock()
 	if mc.conn == nil {
 		mc.cond.Wait()
 	}
-	io.Copy(mc.conn, bytes.NewReader(data))
+	c := mc.conn
 	mc.cond.L.Unlock()
+	io.Copy(c, r)
 }
 
 func (m *MatrixClient) dispatchMessage(p *skn.Packet) {
@@ -118,6 +119,8 @@ func (m *MatrixClient) onAppInfoUpdate(p *skn.Packet) {
 		return
 	}
 	appInfos[info.Id] = info
+
+	tcpServer.BroadcastApps(p)
 }
 
 func (m *MatrixClient) onAppDisconnect(p *skn.Packet) {

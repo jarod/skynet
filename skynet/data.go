@@ -15,9 +15,13 @@ import (
  }
 */
 type AppInfo struct {
-	Id     string
-	Status uint8 // 0 connected, 100 disconnected
-	Agent  string
+	Id      string
+	Status  uint8 // 0 connected, 100 disconnected
+	Agent   string
+	Gateway *struct {
+		Host string
+		Port uint16
+	}
 }
 
 func (a *AppInfo) String() string {

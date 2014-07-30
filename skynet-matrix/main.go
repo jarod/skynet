@@ -12,7 +12,7 @@ import (
 var VERSION = "0.9-SNAPSHOT"
 
 var version = flag.Bool("version", false, "show skynet-matrix version")
-var optLogFile = flag.String("log", "", "log file location, rotate on SIGUSR1")
+var optLogFile = flag.String("log", "", "log file location, reopen on signal SIGUSR1")
 
 var optTcpAddr = flag.String("tcp", ":1860", "address to serve tcp")
 var optHttpAddr = flag.String("http", ":1861", "address to serve http")
@@ -39,7 +39,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	sklog.RegisterRotate(*optLogFile)
+	sklog.SetLogFile(*optLogFile)
 
 	tcpServer = NewTcpServer()
 	go tcpServer.ListenAndServe(*optTcpAddr)

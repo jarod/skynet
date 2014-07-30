@@ -139,6 +139,7 @@ type AppMsg struct {
 	AppId            *string `protobuf:"bytes,1,req,name=app_id" json:"app_id,omitempty"`
 	Head             *uint32 `protobuf:"varint,2,req,name=head" json:"head,omitempty"`
 	Data             []byte  `protobuf:"bytes,3,opt,name=data" json:"data,omitempty"`
+	FromApp          *string `protobuf:"bytes,4,opt,name=from_app" json:"from_app,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -165,6 +166,13 @@ func (m *AppMsg) GetData() []byte {
 		return m.Data
 	}
 	return nil
+}
+
+func (m *AppMsg) GetFromApp() string {
+	if m != nil && m.FromApp != nil {
+		return *m.FromApp
+	}
+	return ""
 }
 
 func init() {
