@@ -55,6 +55,8 @@ func (a *Agent) dispatchAgentPacket(p *skn.Packet) {
 		a.onAppDisconnected(p)
 	case skynet.SkynetMsg_SM_AGENT_FIND_APPS:
 		a.responseAppInfos(p)
+	case skynet.SkynetMsg_SM_SEND_TO_APP:
+		a.sendToApp(p)
 	default:
 		tcpServer.Broadcast(p)
 	}
@@ -104,4 +106,19 @@ func (a *Agent) responseAppInfos(p *skn.Packet) {
 		}
 		appInfos[info.Id] = info
 	}
+}
+
+func (a *Agent) sendToApp(p *skn.Packet) {
+	msg := new(skynet.AppMsg)
+	err := proto.Unmarshal(p.Body, msg)
+	if err != nil {
+		log.Println("sendToApp - ", err)
+		return
+	}
+	info, ok := appInfos[*msg.AppId]
+	if !ok {
+		log.Printf("sendToApp - send to not exist app. from:%s,to:%s,head=%02X", *msg.FromApp, *msg.AppId, *msg.Head)
+		return
+	}
+	tcpServer.SendToAgent(info.Agent, p)
 }

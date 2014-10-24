@@ -94,10 +94,10 @@ func (as *TcpServer) SendToApp(p *skn.Packet) {
 	as.Lock()
 	defer as.Unlock()
 	if c, ok := as.appIdMap[*msg.AppId]; ok {
-		//log.Printf("Msg local appId:%s,head=%d\n", *msg.AppId, *msg.Head)
+		log.Printf("Msg local from:%s,to:%s,head=%02X\n", *msg.FromApp, *msg.AppId, *msg.Head)
 		c.Write(p)
 	} else {
-		//log.Printf("Msg remote appId:%s,head=%d\n", *msg.AppId, *msg.Head)
+		log.Printf("Msg remote from:%s,to:%s,head=%02X\n", *msg.FromApp, *msg.AppId, *msg.Head)
 		matrixClient.Write(p)
 	}
 }

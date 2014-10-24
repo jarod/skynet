@@ -94,3 +94,11 @@ func (t *TcpServer) Broadcast(p *skn.Packet) {
 		v.Write(p)
 	}
 }
+
+func (t *TcpServer) SendToAgent(agentAddr string, p *skn.Packet) {
+	a := t.FindAgentByAddr(agentAddr)
+	if a == nil {
+		return
+	}
+	a.Write(p)
+}

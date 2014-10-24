@@ -1,6 +1,6 @@
-VER=0.9-140730
-OS="linux windows"
-ARCH="amd64 386"
+VER=0.9-141024
+OS="linux"
+ARCH="amd64"
 
 dir="`pwd`"
 mkdir build
