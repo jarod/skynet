@@ -2,10 +2,7 @@ package main
 
 import (
 	"bytes"
-	"code.google.com/p/goprotobuf/proto"
 	"encoding/json"
-	"github.com/jarod/skynet/skynet"
-	skn "github.com/jarod/skynet/skynet/net"
 	"io"
 	"log"
 	"net"
@@ -13,6 +10,10 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/jarod/skynet/skynet"
+	skn "github.com/jarod/skynet/skynet/net"
 )
 
 const (

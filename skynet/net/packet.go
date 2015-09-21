@@ -1,9 +1,10 @@
 package net
 
 import (
-	proto "code.google.com/p/goprotobuf/proto"
 	"fmt"
 	"io"
+
+	"github.com/golang/protobuf/proto"
 )
 
 type Packet struct {

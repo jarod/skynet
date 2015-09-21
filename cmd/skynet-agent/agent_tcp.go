@@ -1,13 +1,14 @@
 package main
 
 import (
-	"code.google.com/p/goprotobuf/proto"
-	"github.com/jarod/skynet/skynet"
-	skn "github.com/jarod/skynet/skynet/net"
 	"io"
 	"log"
 	"net"
 	"sync"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/jarod/skynet/skynet"
+	skn "github.com/jarod/skynet/skynet/net"
 )
 
 type TcpServer struct {

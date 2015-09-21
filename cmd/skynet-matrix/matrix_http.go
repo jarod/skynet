@@ -1,13 +1,14 @@
 package main
 
 import (
-	"code.google.com/p/goprotobuf/proto"
 	"encoding/json"
-	"github.com/jarod/skynet/skynet"
-	"github.com/jarod/skynet/skynet/net"
 	"log"
 	"net/http"
 	"regexp"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/jarod/skynet/skynet"
+	"github.com/jarod/skynet/skynet/net"
 )
 
 type HttpServer struct {

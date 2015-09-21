@@ -2,14 +2,15 @@ package main
 
 import (
 	"bytes"
-	"code.google.com/p/goprotobuf/proto"
 	"encoding/json"
-	"github.com/jarod/skynet/skynet"
-	skn "github.com/jarod/skynet/skynet/net"
 	"io"
 	"log"
 	"net"
 	"sync/atomic"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/jarod/skynet/skynet"
+	skn "github.com/jarod/skynet/skynet/net"
 )
 
 type Agent struct {

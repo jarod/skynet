@@ -1,0 +1,13 @@
+{
+	"ImportPath": "github.com/jarod/skynet",
+	"GoVersion": "go1.5",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "535a10468679b4cf155f6a7afdf53b554633fc09"
+		}
+	]
+}

@@ -2,15 +2,28 @@
 // source: skynet.proto
 // DO NOT EDIT!
 
+/*
+Package skynet is a generated protocol buffer package.
+
+It is generated from these files:
+	skynet.proto
+
+It has these top-level messages:
+	Psint32
+	Psint64
+	Pstring
+	AppServer
+	AppMsg
+*/
 package skynet
 
-import proto "code.google.com/p/goprotobuf/proto"
-import json "encoding/json"
+import proto "github.com/golang/protobuf/proto"
+import fmt "fmt"
 import math "math"
 
-// Reference proto, json, and math imports to suppress error if they are not otherwise used.
+// Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = &json.SyntaxError{}
+var _ = fmt.Errorf
 var _ = math.Inf
 
 type SkynetMsg int32
