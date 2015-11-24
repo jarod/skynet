@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/jarod/skynet/skynet"
-	sklog "github.com/jarod/skynet/skynet/log"
 	"os"
 	"sync"
+
+	"github.com/jarod/skynet/skynet"
+	sklog "github.com/jarod/skynet/skynet/log"
 )
 
-var VERSION = "0.9-SNAPSHOT"
+var VERSION = "0.11-SNAPSHOT"
 
 var version = flag.Bool("version", false, "show skynet-matrix version")
 var optLogFile = flag.String("log", "", "log file location, reopen on signal SIGUSR1")

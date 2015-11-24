@@ -2,20 +2,21 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/jarod/skynet/skynet"
 	"log"
 	"net/http"
+
+	"github.com/jarod/skynet/skynet"
 )
 
-type MatrixHttpClient struct {
+type MatrixHTTPClient struct {
 	urlBase string
 }
 
-func NewMatrixHttpClient(urlBase string) *MatrixHttpClient {
-	return &MatrixHttpClient{urlBase: urlBase}
+func NewMatrixHTTPClient(urlBase string) *MatrixHTTPClient {
+	return &MatrixHTTPClient{urlBase: urlBase}
 }
 
-func (m *MatrixHttpClient) FindApps(pattern string) []*skynet.AppInfo {
+func (m *MatrixHTTPClient) FindApps(pattern string) []*skynet.AppInfo {
 	resp, err := http.Get(m.urlBase + "matrix/apps?pattern=" + pattern)
 	if err != nil {
 		log.Println("FindApps - ", err)

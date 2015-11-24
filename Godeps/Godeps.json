@@ -7,7 +7,7 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/golang/protobuf/proto",
-			"Rev": "535a10468679b4cf155f6a7afdf53b554633fc09"
+			"Rev": "57346232f21afd1b0138cc10fbdd43c4d17e6c16"
 		}
 	]
 }

@@ -41,6 +41,11 @@ func NewPacket(head uint16, body []byte) *Packet {
 	return p
 }
 
+func NewEmptyPacket(head uint16) *Packet {
+	p := &Packet{Head: head}
+	return p
+}
+
 func NewMessagePacket(head uint16, pb proto.Message) (*Packet, error) {
 	data, err := proto.Marshal(pb)
 	if err != nil {

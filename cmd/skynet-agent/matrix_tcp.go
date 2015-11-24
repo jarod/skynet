@@ -97,6 +97,11 @@ func (mc *MatrixClient) Write(p *skn.Packet) {
 	io.Copy(c, r)
 }
 
+func (mc *MatrixClient) Ping() {
+	p := skn.NewEmptyPacket(0x0022)
+	mc.Write(p)
+}
+
 func (m *MatrixClient) dispatchMessage(p *skn.Packet) {
 	switch skynet.SkynetMsg(p.Head) {
 	case skynet.SkynetMsg_SM_APP_INFO:

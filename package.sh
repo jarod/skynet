@@ -1,11 +1,11 @@
-VER=0.9-141024
+VER=0.10-151123
 OS="linux"
 ARCH="amd64"
 
 dir="`pwd`"
 mkdir build
 
-goxc -pv=$VER -wd="$dir/skynet-matrix" -d="$dir/build/" -os="$OS" -arch="$ARCH" -tasks="xc archive"
+goxc -pv=$VER -wd="$dir/cmd/skynet-matrix" -d="$dir/build/" -os="$OS" -arch="$ARCH" -tasks="xc archive"
 
-goxc -pv=$VER -wd="$dir/skynet-agent" -d="$dir/build/" -os="$OS" -arch="$ARCH" -tasks="xc archive"
+goxc -pv=$VER -wd="$dir/cmd/skynet-agent" -d="$dir/build/" -os="$OS" -arch="$ARCH" -tasks="xc archive"
 

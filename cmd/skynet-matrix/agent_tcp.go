@@ -58,6 +58,8 @@ func (a *Agent) dispatchAgentPacket(p *skn.Packet) {
 		a.responseAppInfos(p)
 	case skynet.SkynetMsg_SM_SEND_TO_APP:
 		a.sendToApp(p)
+	case skynet.SkynetMsg_SM_AGENT_PING:
+		log.Println("ping from agent ", a.conn.RemoteAddr())
 	default:
 		tcpServer.Broadcast(p)
 	}

@@ -27,10 +27,11 @@ enum SkynetMsg {
 
 	SM_AGENT_EXECUTE_CMD = 0x0020;
 	SM_AGENT_FIND_APPS = 0x0021;
+	SM_AGENT_PING = 0x0022;
 }
 
 message AppMsg {
-	required string app_id = 1; 
+	required string app_id = 1;
 	required uint32 head = 2;
 	optional bytes data = 3;
 	optional string from_app = 4;
