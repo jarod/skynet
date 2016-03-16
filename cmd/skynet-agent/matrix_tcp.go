@@ -112,6 +112,8 @@ func (m *MatrixClient) dispatchMessage(p *skn.Packet) {
 		m.execAgentCmd(p)
 	case skynet.SkynetMsg_SM_AGENT_FIND_APPS:
 		m.findApps(p)
+	case skynet.SkynetMsg_SM_SEND_TO_APP:
+		m.sendToApp(p)
 	default:
 		tcpServer.BroadcastApps(p)
 	}
@@ -175,4 +177,8 @@ func (m *MatrixClient) findApps(p *skn.Packet) {
 		return
 	}
 	m.Write(p)
+}
+
+func (m *MatrixClient) sendToApp(p *skn.Packet) {
+	tcpServer.SendToApp(p)
 }

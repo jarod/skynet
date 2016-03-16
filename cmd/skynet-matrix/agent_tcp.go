@@ -120,7 +120,7 @@ func (a *Agent) sendToApp(p *skn.Packet) {
 	}
 	info, ok := appInfos[*msg.AppId]
 	if !ok {
-		log.Printf("sendToApp - send to not exist app. from:%s,to:%s,head=%02X", *msg.FromApp, *msg.AppId, *msg.Head)
+		log.Printf("sendToApp - send to not exist app. from:%s,to:%s,head=%04X", *msg.FromApp, *msg.AppId, *msg.Head)
 		return
 	}
 	tcpServer.SendToAgent(info.Agent, p)
