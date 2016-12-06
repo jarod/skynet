@@ -70,14 +70,15 @@ func (a *Agent) updateAppInfo(p *skn.Packet) {
 	info := new(skynet.AppInfo)
 	err := json.Unmarshal(p.Body, info)
 	if err != nil {
-		log.Println("updateAppInfo - ", err)
+		log.Println("agent: updateAppInfo - ", err)
 		return
 	}
+	log.Println("agent: updateAppInfo - ", info)
 	info.Agent = a.conn.RemoteAddr().String()
 	appInfos[info.Id] = info
 	p.Body, err = json.Marshal(info)
 	if err != nil {
-		log.Println("updateAppInfo - ", err)
+		log.Println("agent: updateAppInfo - ", err)
 		return
 	}
 	tcpServer.Broadcast(p)

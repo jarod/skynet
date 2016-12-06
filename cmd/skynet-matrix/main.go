@@ -10,7 +10,7 @@ import (
 	sklog "github.com/jarod/skynet/skynet/log"
 )
 
-var VERSION = "0.11-SNAPSHOT"
+var VERSION = "0.12-SNAPSHOT"
 
 var version = flag.Bool("version", false, "show skynet-matrix version")
 var optLogFile = flag.String("log", "", "log file location, reopen on signal SIGUSR1")

@@ -3,12 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/jarod/skynet/skynet"
-	skn "github.com/jarod/skynet/skynet/net"
 	"io"
 	"log"
 	"net"
 	"regexp"
+
+	"github.com/jarod/skynet/skynet"
+	skn "github.com/jarod/skynet/skynet/net"
 )
 
 var (
@@ -69,6 +70,7 @@ func (a *App) updateAppInfo(p *skn.Packet) {
 		log.Println("app: updateAppInfo - ", err)
 		return
 	}
+	log.Println("app: updateAppInfo - ", info)
 	a.id = info.Id
 	tcpServer.appIdMap[a.id] = a
 	matrixClient.Write(p)

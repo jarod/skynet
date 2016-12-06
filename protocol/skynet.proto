@@ -1,3 +1,4 @@
+syntax = "proto2";
 package skynet;
 option java_package="skynet.proto";
 
